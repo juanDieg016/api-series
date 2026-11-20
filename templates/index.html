@@ -1,0 +1,2722 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Series API</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        :root {
+            --bg: #07111f;
+            --bg2: #0b1728;
+            --panel: #102036;
+            --panel2: #142944;
+            --border: #214565;
+
+            --text: #f5f7fa;
+            --muted: #91a4b7;
+
+            --blue: #1687ff;
+            --cyan: #00c9d9;
+            --coral: #ff6258;
+            --green: #19c37d;
+            --yellow: #ffc857;
+
+            --danger: #ef4444;
+        }
+
+        body {
+            min-height: 100vh;
+            font-family: Inter, Arial, Helvetica, sans-serif;
+            background:
+                radial-gradient(circle at 15% 10%, rgba(0, 201, 217, .13), transparent 30%),
+                radial-gradient(circle at 90% 90%, rgba(255, 98, 88, .10), transparent 30%),
+                var(--bg);
+            color: var(--text);
+        }
+
+        button,
+        input,
+        select {
+            font: inherit;
+        }
+
+        button {
+            cursor: pointer;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .auth-page {
+            min-height: 100vh;
+            display: grid;
+            place-items: center;
+            padding: 30px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .auth-decoration {
+            position: fixed;
+            width: 430px;
+            height: 430px;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: .18;
+            pointer-events: none;
+        }
+
+        .decor-1 {
+            top: -150px;
+            left: -100px;
+            background: var(--cyan);
+        }
+
+        .decor-2 {
+            right: -140px;
+            bottom: -130px;
+            background: var(--coral);
+        }
+
+        .auth-card {
+            position: relative;
+            z-index: 1;
+            width: 100%;
+            max-width: 440px;
+            padding: 36px;
+            border-radius: 22px;
+            background: rgba(16, 32, 54, .93);
+            border: 1px solid var(--border);
+            box-shadow: 0 30px 80px rgba(0, 0, 0, .45);
+            backdrop-filter: blur(14px);
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 28px;
+        }
+
+        .logo-icon {
+            width: 46px;
+            height: 46px;
+            display: grid;
+            place-items: center;
+            border-radius: 13px;
+            background: linear-gradient(135deg, var(--coral), #ff876d);
+            box-shadow: 0 0 30px rgba(255, 98, 88, .24);
+            font-size: 23px;
+        }
+
+        .logo strong {
+            font-size: 23px;
+        }
+
+        .auth-card h1 {
+            font-size: 30px;
+            margin-bottom: 7px;
+        }
+
+        .auth-subtitle {
+            color: var(--muted);
+            margin-bottom: 27px;
+            line-height: 1.5;
+        }
+
+        .form-group {
+            margin-bottom: 17px;
+        }
+
+        label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #d4deea;
+        }
+
+        input,
+        select {
+            width: 100%;
+            padding: 13px 14px;
+            color: var(--text);
+            background: #091526;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            outline: none;
+            transition: .2s;
+        }
+
+        input:focus,
+        select:focus {
+            border-color: var(--cyan);
+            box-shadow: 0 0 0 3px rgba(0, 201, 217, .13);
+        }
+
+        input::placeholder {
+            color: #63788e;
+        }
+
+        .btn {
+            border: 1px solid transparent;
+            padding: 10px 14px;
+            border-radius: 9px;
+            font-weight: 700;
+            transition: .2s;
+        }
+
+        .btn:hover {
+            transform: translateY(-1px);
+        }
+
+        .btn-full {
+            width: 100%;
+            padding: 13px;
+        }
+
+        .btn-login {
+            background: linear-gradient(90deg, var(--coral), #ff7a67);
+            color: white;
+        }
+
+        .btn-register {
+            background: linear-gradient(90deg, var(--blue), var(--cyan));
+            color: white;
+        }
+
+        .switch-auth {
+            margin-top: 21px;
+            text-align: center;
+            color: var(--muted);
+            font-size: 14px;
+        }
+
+        .switch-auth button {
+            border: 0;
+            padding: 0;
+            margin-left: 3px;
+            color: var(--cyan);
+            background: transparent;
+            font-weight: 700;
+        }
+
+        .message {
+            padding: 11px 13px;
+            border-radius: 9px;
+            margin-bottom: 17px;
+            font-size: 13px;
+        }
+
+        .message-error {
+            background: rgba(239, 68, 68, .10);
+            border: 1px solid rgba(239, 68, 68, .28);
+            color: #ff8585;
+        }
+
+        .message-success {
+            background: rgba(25, 195, 125, .10);
+            border: 1px solid rgba(25, 195, 125, .28);
+            color: #53e3a7;
+        }
+
+        .app {
+            min-height: 100vh;
+        }
+
+        .navbar {
+            position: sticky;
+            top: 0;
+            z-index: 30;
+            height: 72px;
+            background: rgba(7, 17, 31, .94);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .navbar-inner {
+            max-width: 1450px;
+            height: 100%;
+            margin: auto;
+            padding: 0 28px;
+            display: flex;
+            align-items: center;
+            gap: 30px;
+        }
+
+        .navbar .logo {
+            margin: 0;
+            margin-right: 20px;
+        }
+
+        .navbar .logo-icon {
+            width: 37px;
+            height: 37px;
+            font-size: 18px;
+            border-radius: 10px;
+        }
+
+        .nav-link {
+            height: 100%;
+            display: flex;
+            align-items: center;
+            border-bottom: 3px solid var(--cyan);
+            color: white;
+            font-weight: 700;
+        }
+
+        .navbar-spacer {
+            flex: 1;
+        }
+
+        .user-menu {
+            position: relative;
+        }
+
+        .user-button {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            padding: 8px 12px;
+            border: 1px solid var(--border);
+            background: #0d1b2d;
+            color: white;
+            border-radius: 999px;
+        }
+
+        .avatar {
+            width: 30px;
+            height: 30px;
+            display: grid;
+            place-items: center;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--cyan), var(--blue));
+            font-weight: 800;
+        }
+
+        .role-badge {
+            color: var(--yellow);
+            font-size: 12px;
+        }
+
+        .dropdown {
+            position: absolute;
+            right: 0;
+            top: calc(100% + 10px);
+            width: 210px;
+            background: var(--panel);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 8px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, .4);
+        }
+
+        .dropdown button {
+            width: 100%;
+            text-align: left;
+            padding: 11px;
+            border: 0;
+            border-radius: 8px;
+            background: transparent;
+            color: #dce7f2;
+        }
+
+        .dropdown button:hover {
+            background: var(--panel2);
+        }
+
+        .dropdown .logout {
+            color: #ff7770;
+        }
+
+        .container {
+            max-width: 1450px;
+            margin: auto;
+            padding: 37px 28px 70px;
+        }
+
+        .page-heading {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            gap: 20px;
+            margin-bottom: 28px;
+        }
+
+        .page-heading h1 {
+            font-size: 34px;
+            margin-bottom: 6px;
+        }
+
+        .page-heading p {
+            color: var(--muted);
+        }
+
+        .heading-actions {
+            display: flex;
+            gap: 12px;
+        }
+
+        .search-box {
+            width: 310px;
+            position: relative;
+        }
+
+        .search-box input {
+            padding-right: 42px;
+        }
+
+        .search-icon {
+            position: absolute;
+            right: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--muted);
+        }
+
+        .btn-new {
+            background: linear-gradient(90deg, var(--coral), #ff7f67);
+            color: white;
+            padding-left: 18px;
+            padding-right: 18px;
+        }
+
+        .series-grid {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 20px;
+        }
+
+        .serie-card {
+            border: 1px solid var(--border);
+            border-radius: 15px;
+            overflow: hidden;
+            background: var(--panel);
+            transition: .25s;
+        }
+
+        .serie-card:hover {
+            transform: translateY(-4px);
+            border-color: #31709c;
+            box-shadow: 0 18px 40px rgba(0, 0, 0, .25);
+        }
+
+        .serie-cover {
+            height: 175px;
+            position: relative;
+            padding: 22px;
+            display: flex;
+            align-items: flex-end;
+            overflow: hidden;
+            background:
+                radial-gradient(circle at 20% 20%, rgba(0, 201, 217, .45), transparent 35%),
+                linear-gradient(135deg, #102c48, #122038 50%, #311b32);
+        }
+
+        .serie-cover::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to top, rgba(5, 13, 23, .9), transparent 70%);
+        }
+
+        .cover-symbol {
+            position: absolute;
+            right: 20px;
+            top: 15px;
+            font-size: 60px;
+            opacity: .16;
+        }
+
+        .cover-id {
+            position: relative;
+            z-index: 2;
+            font-size: 12px;
+            color: #b6c8d9;
+        }
+
+        .serie-body {
+            padding: 17px;
+        }
+
+        .serie-title {
+            font-size: 20px;
+            margin-bottom: 10px;
+        }
+
+        .serie-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-bottom: 15px;
+        }
+
+        .tag {
+            padding: 5px 8px;
+            border-radius: 999px;
+            background: #18324e;
+            border: 1px solid #27516f;
+            color: #9dd9f3;
+            font-size: 11px;
+        }
+
+        .tag-platform {
+            color: #ffaca5;
+            border-color: rgba(255, 98, 88, .3);
+            background: rgba(255, 98, 88, .08);
+        }
+
+        .serie-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 7px;
+        }
+
+        .btn-watch {
+            color: white;
+            background: var(--blue);
+        }
+
+        .btn-download {
+            color: #dbe7f3;
+            border-color: var(--border);
+            background: #0b1728;
+        }
+
+        .btn-edit {
+            color: white;
+            background: #008aa0;
+        }
+
+        .btn-delete {
+            color: white;
+            background: var(--danger);
+        }
+
+        .empty-state {
+            grid-column: 1 / -1;
+            text-align: center;
+            color: var(--muted);
+            border: 1px dashed var(--border);
+            border-radius: 16px;
+            padding: 70px 20px;
+        }
+
+        .modal-backdrop {
+            position: fixed;
+            inset: 0;
+            z-index: 100;
+            display: grid;
+            place-items: center;
+            padding: 20px;
+            background: rgba(1, 7, 15, .80);
+            backdrop-filter: blur(5px);
+        }
+
+        .modal {
+            width: 100%;
+            max-width: 780px;
+            max-height: 90vh;
+            overflow-y: auto;
+            background: var(--panel);
+            border: 1px solid var(--border);
+            border-radius: 18px;
+            box-shadow: 0 25px 90px rgba(0, 0, 0, .55);
+        }
+
+        .modal-small {
+            max-width: 450px;
+        }
+
+        .modal-video {
+            max-width: 1000px;
+        }
+
+        .modal-header {
+            padding: 19px 22px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .modal-close {
+            border: 0;
+            background: transparent;
+            color: white;
+            font-size: 24px;
+        }
+
+        .modal-body {
+            padding: 23px;
+        }
+
+        .modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            padding: 17px 22px;
+            border-top: 1px solid var(--border);
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        .full {
+            grid-column: 1 / -1;
+        }
+
+        .file-area {
+            padding: 25px;
+            text-align: center;
+            border: 1px dashed #3485a8;
+            border-radius: 12px;
+            background: rgba(0, 201, 217, .04);
+        }
+
+        .file-area input {
+            margin-top: 12px;
+        }
+
+        .btn-cancel {
+            color: white;
+            background: #13263d;
+            border-color: var(--border);
+        }
+
+        .btn-save {
+            color: white;
+            background: linear-gradient(90deg, var(--coral), #ff7967);
+        }
+
+        .delete-icon {
+            width: 65px;
+            height: 65px;
+            margin: 5px auto 18px;
+            display: grid;
+            place-items: center;
+            border-radius: 50%;
+            background: rgba(239, 68, 68, .15);
+            color: #ff6b67;
+            font-size: 30px;
+        }
+
+        .delete-text {
+            text-align: center;
+        }
+
+        .delete-text h2 {
+            margin-bottom: 10px;
+        }
+
+        .delete-text p {
+            color: var(--muted);
+            line-height: 1.5;
+        }
+
+        video {
+            width: 100%;
+            max-height: 70vh;
+            background: black;
+            border-radius: 10px;
+        }
+
+        .toast-container {
+            position: fixed;
+            right: 22px;
+            bottom: 22px;
+            z-index: 500;
+        }
+
+        .toast {
+            min-width: 270px;
+            margin-top: 10px;
+            padding: 13px 16px;
+            border-radius: 10px;
+            background: #11243a;
+            border: 1px solid var(--border);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, .35);
+        }
+
+        .toast.success {
+            border-color: rgba(25, 195, 125, .5);
+        }
+
+        .toast.error {
+            border-color: rgba(239, 68, 68, .5);
+        }
+
+        @media (max-width: 1050px) {
+            .series-grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+        }
+
+        @media (max-width: 760px) {
+            .navbar-inner {
+                padding: 0 15px;
+            }
+
+            .nav-link {
+                display: none;
+            }
+
+            .container {
+                padding: 25px 15px 50px;
+            }
+
+            .page-heading {
+                align-items: stretch;
+                flex-direction: column;
+            }
+
+            .heading-actions {
+                flex-direction: column;
+            }
+
+            .search-box {
+                width: 100%;
+            }
+
+            .series-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .full {
+                grid-column: auto;
+            }
+
+            .username-text {
+                display: none;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<section id="loginView" class="auth-page">
+
+    <div class="auth-decoration decor-1"></div>
+    <div class="auth-decoration decor-2"></div>
+
+    <div class="auth-card">
+
+        <div class="logo">
+            <div class="logo-icon">🎬</div>
+            <strong>Series API</strong>
+        </div>
+
+        <h1>Inicia sesión</h1>
+
+        <p class="auth-subtitle">
+            Accede al catálogo de series.
+        </p>
+
+        <div id="loginMessage"></div>
+
+        <form id="loginForm">
+
+            <div class="form-group">
+                <label for="loginUsername">Usuario</label>
+
+                <input
+                    id="loginUsername"
+                    type="text"
+                    placeholder="Tu usuario"
+                    required>
+            </div>
+
+            <div class="form-group">
+                <label for="loginPassword">Contraseña</label>
+
+                <input
+                    id="loginPassword"
+                    type="password"
+                    placeholder="Tu contraseña"
+                    required>
+            </div>
+
+            <button
+                type="submit"
+                class="btn btn-full btn-login">
+                Ingresar →
+            </button>
+
+        </form>
+
+        <div class="switch-auth">
+            ¿No tienes cuenta?
+
+            <button type="button" onclick="showRegister()">
+                Regístrate
+            </button>
+        </div>
+
+    </div>
+
+</section>
+
+<section id="registerView" class="auth-page hidden">
+
+    <div class="auth-decoration decor-1"></div>
+    <div class="auth-decoration decor-2"></div>
+
+    <div class="auth-card">
+
+        <div class="logo">
+            <div
+                class="logo-icon"
+                style="background:linear-gradient(135deg,var(--blue),var(--cyan));">
+                ◈
+            </div>
+
+            <strong>Series API</strong>
+        </div>
+
+        <h1>Crear cuenta</h1>
+
+        <p class="auth-subtitle">
+            Regístrate para acceder al catálogo.
+        </p>
+
+        <div id="registerMessage"></div>
+
+        <form id="registerForm">
+
+            <div class="form-group">
+
+                <label for="registerUsername">
+                    Usuario
+                </label>
+
+                <input
+                    id="registerUsername"
+                    type="text"
+                    minlength="3"
+                    maxlength="30"
+                    required
+                    placeholder="Crea tu usuario">
+
+            </div>
+
+            <div class="form-group">
+
+                <label for="registerPassword">
+                    Contraseña
+                </label>
+
+                <input
+                    id="registerPassword"
+                    type="password"
+                    minlength="6"
+                    required
+                    placeholder="Mínimo 6 caracteres">
+
+            </div>
+
+            <button
+                type="submit"
+                class="btn btn-full btn-register">
+                Registrarme
+            </button>
+
+        </form>
+
+        <div class="switch-auth">
+
+            ¿Ya tienes cuenta?
+
+            <button type="button" onclick="showLogin()">
+                Inicia sesión
+            </button>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<div id="appView" class="app hidden">
+
+   <header class="navbar">
+
+    <div class="navbar-inner">
+
+        <div class="logo">
+
+            <div class="logo-icon">
+                🎬
+            </div>
+
+            <strong>Series API</strong>
+
+        </div>
+
+        <div class="nav-link">
+            📺 Series
+        </div>
+
+        <div class="navbar-spacer"></div>
+
+        <div class="user-menu">
+
+            <button
+                class="user-button"
+                onclick="toggleUserMenu()">
+
+                <div class="avatar">
+                    👤
+                </div>
+
+                <span
+                    id="usernameDisplay"
+                    class="username-text">
+                    Usuario
+                </span>
+
+                <span
+                    id="roleDisplay"
+                    class="role-badge">
+                </span>
+
+                ▾
+
+            </button>
+
+            <div
+                id="userDropdown"
+                class="dropdown hidden">
+
+                <button
+                    type="button"
+                    onclick="window.location.href='/mi-cuenta'">
+
+                    👤 Mi cuenta
+
+                </button>
+
+                <button
+                    type="button"
+                    onclick="checkApiStatus()">
+
+                    &lt;/&gt; API activa
+
+                </button>
+
+                <button
+                    type="button"
+                    class="logout"
+                    onclick="logout()">
+
+                    ↪ Cerrar sesión
+
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</header>
+
+
+    <main class="container">
+
+        <div class="page-heading">
+
+            <div>
+
+                <h1>Catálogo de Series</h1>
+
+                <p>
+                    Consulta y administra el contenido disponible.
+                </p>
+
+            </div>
+
+
+            <div class="heading-actions">
+
+                <button
+                    id="newSerieButton"
+                    class="btn btn-new hidden"
+                    onclick="openCreateModal()">
+
+                    ＋ Nueva Serie
+
+                </button>
+
+
+                <div class="search-box">
+
+                    <input
+                        id="searchInput"
+                        type="text"
+                        placeholder="Buscar serie..."
+                        oninput="filterSeries()">
+
+                    <span class="search-icon">
+                        🔍
+                    </span>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div id="seriesGrid" class="series-grid"></div>
+
+    </main>
+
+</div>
+
+
+<div id="serieModal" class="modal-backdrop hidden">
+
+    <div class="modal">
+
+        <div class="modal-header">
+
+            <h2 id="serieModalTitle">
+                Nueva Serie
+            </h2>
+
+            <button
+                class="modal-close"
+                onclick="closeSerieModal()">
+                ×
+            </button>
+
+        </div>
+
+
+        <form id="serieForm">
+
+            <div class="modal-body">
+
+                <div class="form-grid">
+
+                    <div class="full">
+
+                        <label for="serieTitulo">
+                            Título *
+                        </label>
+
+                        <input
+                            id="serieTitulo"
+                            type="text"
+                            required
+                            placeholder="Ej. Dark">
+
+                    </div>
+
+
+                    <div>
+
+                        <label for="serieGenero">
+                            Género *
+                        </label>
+
+                        <input
+                            id="serieGenero"
+                            type="text"
+                            required
+                            placeholder="Ej. Ciencia Ficción">
+
+                    </div>
+
+
+                    <div>
+
+                        <label for="seriePlataforma">
+                            Plataforma *
+                        </label>
+
+                        <input
+                            id="seriePlataforma"
+                            type="text"
+                            required
+                            placeholder="Ej. Netflix">
+
+                    </div>
+
+
+                    <div>
+
+                        <label for="serieTemporadas">
+                            Temporadas *
+                        </label>
+
+                        <input
+                            id="serieTemporadas"
+                            type="number"
+                            min="1"
+                            max="100"
+                            required
+                            placeholder="1">
+
+                    </div>
+
+
+                    <div class="full">
+
+                        <label>
+                            Video
+                        </label>
+
+                        <div class="file-area">
+
+                            <div style="font-size:35px">
+                                ☁
+                            </div>
+
+                            <p style="margin-top:8px">
+                                Selecciona un archivo de video
+                            </p>
+
+                            <p
+                                style="
+                                    margin-top:4px;
+                                    color:var(--muted);
+                                    font-size:12px;
+                                ">
+                                MP4, WEBM o MKV · máximo 500 MB
+                            </p>
+
+                            <input
+                                id="serieVideo"
+                                type="file"
+                                accept=".mp4,.webm,.mkv">
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div class="modal-footer">
+
+                <button
+                    type="button"
+                    class="btn btn-cancel"
+                    onclick="closeSerieModal()">
+
+                    Cancelar
+
+                </button>
+
+                <button
+                    type="submit"
+                    class="btn btn-save">
+
+                    Guardar
+
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+
+<div id="deleteModal" class="modal-backdrop hidden">
+
+    <div class="modal modal-small">
+
+        <div class="modal-body">
+
+            <div class="delete-icon">
+                🗑
+            </div>
+
+            <div class="delete-text">
+
+                <h2>
+                    ¿Eliminar serie?
+                </h2>
+
+                <p>
+                    Esta acción no se puede deshacer.
+                    <br>
+
+                    ¿Deseas eliminar
+                    <strong id="deleteSerieName"></strong>?
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <div class="modal-footer">
+
+            <button
+                class="btn btn-cancel"
+                onclick="closeDeleteModal()">
+
+                Cancelar
+
+            </button>
+
+            <button
+                class="btn btn-delete"
+                onclick="confirmDelete()">
+
+                🗑 Eliminar
+
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<div id="videoModal" class="modal-backdrop hidden">
+
+    <div class="modal modal-video">
+
+        <div class="modal-header">
+
+            <h2 id="videoTitle">
+                Reproducir serie
+            </h2>
+
+            <button
+                class="modal-close"
+                onclick="closeVideoModal()">
+                ×
+            </button>
+
+        </div>
+
+        <div class="modal-body">
+
+            <video
+                id="videoPlayer"
+                controls>
+            </video>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<div id="toastContainer" class="toast-container"></div>
+
+
+<script>
+
+    let token =
+        localStorage.getItem("series_token");
+
+    let currentRole =
+        localStorage.getItem("series_role");
+
+    let currentUsername =
+        localStorage.getItem("series_username");
+
+    let series = [];
+
+    let editingSerieId = null;
+
+    let deletingSerieId = null;
+
+    let searchTimeout = null;
+
+
+    document.addEventListener(
+        "DOMContentLoaded",
+        async () => {
+
+            if (token) {
+
+                const valido =
+                    await validateSession();
+
+                if (valido) {
+
+                    showApp();
+
+                    await loadSeries();
+
+                    return;
+                }
+            }
+
+            showLogin();
+        }
+    );
+
+
+    function showLogin() {
+
+        document
+            .getElementById(
+                "loginView"
+            )
+            .classList.remove(
+                "hidden"
+            );
+
+        document
+            .getElementById(
+                "registerView"
+            )
+            .classList.add(
+                "hidden"
+            );
+
+        document
+            .getElementById(
+                "appView"
+            )
+            .classList.add(
+                "hidden"
+            );
+    }
+
+
+    function showRegister() {
+
+        document
+            .getElementById(
+                "loginView"
+            )
+            .classList.add(
+                "hidden"
+            );
+
+        document
+            .getElementById(
+                "registerView"
+            )
+            .classList.remove(
+                "hidden"
+            );
+
+        document
+            .getElementById(
+                "appView"
+            )
+            .classList.add(
+                "hidden"
+            );
+    }
+
+
+    function showApp() {
+
+        document
+            .getElementById(
+                "loginView"
+            )
+            .classList.add(
+                "hidden"
+            );
+
+        document
+            .getElementById(
+                "registerView"
+            )
+            .classList.add(
+                "hidden"
+            );
+
+        document
+            .getElementById(
+                "appView"
+            )
+            .classList.remove(
+                "hidden"
+            );
+
+
+        document.getElementById(
+            "usernameDisplay"
+        ).textContent =
+            currentUsername || "Usuario";
+
+
+        document.getElementById(
+            "roleDisplay"
+        ).textContent =
+            currentRole === "admin"
+                ? "ADMIN"
+                : "";
+
+
+        document.getElementById(
+            "newSerieButton"
+        ).classList.toggle(
+            "hidden",
+            currentRole !== "admin"
+        );
+    }
+
+
+    document
+        .getElementById(
+            "loginForm"
+        )
+        .addEventListener(
+            "submit",
+            async event => {
+
+                event.preventDefault();
+
+                clearMessage(
+                    "loginMessage"
+                );
+
+
+                const username =
+                    document
+                        .getElementById(
+                            "loginUsername"
+                        )
+                        .value
+                        .trim();
+
+
+                const clave =
+                    document
+                        .getElementById(
+                            "loginPassword"
+                        )
+                        .value;
+
+
+                try {
+
+                    const response =
+                        await fetch(
+                            "/login",
+                            {
+                                method: "POST",
+
+                                headers: {
+                                    "Content-Type":
+                                        "application/json"
+                                },
+
+                                body:
+                                    JSON.stringify({
+                                        username,
+                                        clave
+                                    })
+                            }
+                        );
+
+
+                    const data =
+                        await response.json();
+
+
+                    if (!response.ok) {
+
+                        showMessage(
+                            "loginMessage",
+                            data.error ||
+                            "No fue posible iniciar sesión.",
+                            "error"
+                        );
+
+                        return;
+                    }
+
+
+                    token =
+                        data.token;
+
+                    currentRole =
+                        data.rol;
+
+                    currentUsername =
+                        data.username;
+
+
+                    localStorage.setItem(
+                        "series_token",
+                        token
+                    );
+
+                    localStorage.setItem(
+                        "series_role",
+                        currentRole
+                    );
+
+                    localStorage.setItem(
+                        "series_username",
+                        currentUsername
+                    );
+
+
+                    showApp();
+
+                    await loadSeries();
+
+                } catch (error) {
+
+                    showMessage(
+                        "loginMessage",
+                        "No fue posible conectar con el servidor.",
+                        "error"
+                    );
+                }
+            }
+        );
+
+
+    document
+        .getElementById(
+            "registerForm"
+        )
+        .addEventListener(
+            "submit",
+            async event => {
+
+                event.preventDefault();
+
+                clearMessage(
+                    "registerMessage"
+                );
+
+
+                const username =
+                    document
+                        .getElementById(
+                            "registerUsername"
+                        )
+                        .value
+                        .trim();
+
+
+                const clave =
+                    document
+                        .getElementById(
+                            "registerPassword"
+                        )
+                        .value;
+
+
+                try {
+
+                    const response =
+                        await fetch(
+                            "/registro",
+                            {
+                                method: "POST",
+
+                                headers: {
+                                    "Content-Type":
+                                        "application/json"
+                                },
+
+                                body:
+                                    JSON.stringify({
+                                        username,
+                                        clave
+                                    })
+                            }
+                        );
+
+
+                    const data =
+                        await response.json();
+
+
+                    if (!response.ok) {
+
+                        showMessage(
+                            "registerMessage",
+                            data.error ||
+                            "No fue posible registrar el usuario.",
+                            "error"
+                        );
+
+                        return;
+                    }
+
+
+                    showMessage(
+                        "registerMessage",
+                        "Usuario registrado correctamente. Ya puedes iniciar sesión.",
+                        "success"
+                    );
+
+
+                    document
+                        .getElementById(
+                            "registerForm"
+                        )
+                        .reset();
+
+
+                    setTimeout(
+                        () => {
+
+                            showLogin();
+
+                            document
+                                .getElementById(
+                                    "loginUsername"
+                                )
+                                .value =
+                                    username;
+                        },
+                        1300
+                    );
+
+                } catch (error) {
+
+                    showMessage(
+                        "registerMessage",
+                        "No fue posible conectar con el servidor.",
+                        "error"
+                    );
+                }
+            }
+        );
+
+
+    async function validateSession() {
+
+        try {
+
+            const response =
+                await fetch(
+                    "/me",
+                    {
+                        headers: {
+                            Authorization:
+                                `Bearer ${token}`
+                        }
+                    }
+                );
+
+
+            if (!response.ok) {
+
+                clearSession();
+
+                return false;
+            }
+
+
+            const data =
+                await response.json();
+
+
+            currentUsername =
+                data.username;
+
+            currentRole =
+                data.rol;
+
+
+            localStorage.setItem(
+                "series_username",
+                currentUsername
+            );
+
+            localStorage.setItem(
+                "series_role",
+                currentRole
+            );
+
+
+            return true;
+
+        } catch (error) {
+
+            return false;
+        }
+    }
+
+
+    function logout() {
+
+        clearSession();
+
+        document
+            .getElementById(
+                "userDropdown"
+            )
+            .classList.add(
+                "hidden"
+            );
+
+        showLogin();
+    }
+
+
+    function clearSession() {
+
+        token = null;
+
+        currentRole = null;
+
+        currentUsername = null;
+
+
+        localStorage.removeItem(
+            "series_token"
+        );
+
+        localStorage.removeItem(
+            "series_role"
+        );
+
+        localStorage.removeItem(
+            "series_username"
+        );
+    }
+
+
+    function toggleUserMenu() {
+
+        document
+            .getElementById(
+                "userDropdown"
+            )
+            .classList.toggle(
+                "hidden"
+            );
+    }
+
+
+    async function loadSeries() {
+
+        try {
+
+            const response =
+                await fetch(
+                    "/series"
+                );
+
+
+            if (!response.ok) {
+
+                showToast(
+                    "No fue posible cargar las series.",
+                    "error"
+                );
+
+                return;
+            }
+
+
+            const data =
+                await response.json();
+
+
+            series =
+                data;
+
+
+            renderSeries(
+                series
+            );
+
+        } catch (error) {
+
+            showToast(
+                "Error conectando con el servidor.",
+                "error"
+            );
+        }
+    }
+
+
+    function renderSeries(lista) {
+
+        const grid =
+            document.getElementById(
+                "seriesGrid"
+            );
+
+
+        if (!lista.length) {
+
+            grid.innerHTML = `
+                <div class="empty-state">
+
+                    <div style="font-size:50px;margin-bottom:15px;">
+                        🎬
+                    </div>
+
+                    <h2>
+                        No hay series registradas
+                    </h2>
+
+                    <p style="margin-top:8px;">
+                        ${
+                            currentRole === "admin"
+                                ? "Crea la primera serie utilizando el botón Nueva Serie."
+                                : "Todavía no hay contenido disponible."
+                        }
+                    </p>
+
+                </div>
+            `;
+
+            return;
+        }
+
+
+        grid.innerHTML =
+            lista
+                .map(
+                    serie =>
+                        serieCardHtml(
+                            serie
+                        )
+                )
+                .join("");
+    }
+
+
+    function serieCardHtml(serie) {
+
+        const adminButtons =
+            currentRole === "admin"
+                ? `
+                    <button
+                        class="btn btn-edit"
+                        onclick="openEditModal(${serie.id})">
+
+                        ✎ Editar
+
+                    </button>
+
+                    <button
+                        class="btn btn-delete"
+                        onclick="openDeleteModal(${serie.id})">
+
+                        🗑 Eliminar
+
+                    </button>
+                `
+                : "";
+
+
+        const watchButton =
+            serie.archivo
+                ? `
+                    <button
+                        class="btn btn-watch"
+                        onclick="openVideo(${serie.id})">
+
+                        ▶ Ver
+
+                    </button>
+
+                    <button
+                        class="btn btn-download"
+                        onclick="downloadVideo(${serie.id})">
+
+                        ⇩ Descargar
+
+                    </button>
+                `
+                : `
+                    <button
+                        class="btn btn-download"
+                        disabled
+                        style="opacity:.45;cursor:not-allowed;">
+
+                        Sin video
+
+                    </button>
+                `;
+
+
+        return `
+            <article class="serie-card">
+
+                <div class="serie-cover">
+
+                    <div class="cover-symbol">
+                        🎞
+                    </div>
+
+                    <div class="cover-id">
+                        SERIE #${serie.id}
+                    </div>
+
+                </div>
+
+
+                <div class="serie-body">
+
+                    <h2 class="serie-title">
+                        ${escapeHtml(serie.titulo)}
+                    </h2>
+
+
+                    <div class="serie-tags">
+
+                        <span class="tag">
+                            🎭 ${escapeHtml(serie.genero)}
+                        </span>
+
+                        <span class="tag tag-platform">
+                            📺 ${escapeHtml(serie.plataforma)}
+                        </span>
+
+                        <span class="tag">
+
+                            ${serie.temporadas}
+
+                            ${
+                                serie.temporadas === 1
+                                    ? "temporada"
+                                    : "temporadas"
+                            }
+
+                        </span>
+
+                    </div>
+
+
+                    <div class="serie-actions">
+
+                        ${watchButton}
+
+                        ${adminButtons}
+
+                    </div>
+
+                </div>
+
+            </article>
+        `;
+    }
+
+
+    function filterSeries() {
+
+        clearTimeout(
+            searchTimeout
+        );
+
+
+        searchTimeout =
+            setTimeout(
+                async () => {
+
+                    const term =
+                        document
+                            .getElementById(
+                                "searchInput"
+                            )
+                            .value
+                            .trim();
+
+
+                    try {
+
+                        const url =
+                            term
+                                ? `/series?buscar=${encodeURIComponent(term)}`
+                                : "/series";
+
+
+                        const response =
+                            await fetch(
+                                url
+                            );
+
+
+                        if (!response.ok) {
+
+                            showToast(
+                                "No fue posible realizar la búsqueda.",
+                                "error"
+                            );
+
+                            return;
+                        }
+
+
+                        const resultados =
+                            await response.json();
+
+
+                        if (!term) {
+
+                            series =
+                                resultados;
+                        }
+
+
+                        renderSeries(
+                            resultados
+                        );
+
+
+                    } catch (error) {
+
+                        showToast(
+                            "Error realizando la búsqueda.",
+                            "error"
+                        );
+                    }
+
+                },
+                300
+            );
+    }
+
+
+    function openCreateModal() {
+
+        editingSerieId =
+            null;
+
+
+        document.getElementById(
+            "serieModalTitle"
+        ).textContent =
+            "Nueva Serie";
+
+
+        document
+            .getElementById(
+                "serieForm"
+            )
+            .reset();
+
+
+        document
+            .getElementById(
+                "serieModal"
+            )
+            .classList.remove(
+                "hidden"
+            );
+    }
+
+
+    function openEditModal(id) {
+
+        const serie =
+            series.find(
+                item =>
+                    item.id === id
+            );
+
+
+        if (!serie) {
+            return;
+        }
+
+
+        editingSerieId =
+            id;
+
+
+        document.getElementById(
+            "serieModalTitle"
+        ).textContent =
+            "Editar Serie";
+
+
+        document.getElementById(
+            "serieTitulo"
+        ).value =
+            serie.titulo;
+
+
+        document.getElementById(
+            "serieGenero"
+        ).value =
+            serie.genero;
+
+
+        document.getElementById(
+            "seriePlataforma"
+        ).value =
+            serie.plataforma;
+
+
+        document.getElementById(
+            "serieTemporadas"
+        ).value =
+            serie.temporadas;
+
+
+        document.getElementById(
+            "serieVideo"
+        ).value =
+            "";
+
+
+        document
+            .getElementById(
+                "serieModal"
+            )
+            .classList.remove(
+                "hidden"
+            );
+    }
+
+
+    function closeSerieModal() {
+
+        document
+            .getElementById(
+                "serieModal"
+            )
+            .classList.add(
+                "hidden"
+            );
+
+
+        editingSerieId =
+            null;
+    }
+
+
+    document
+        .getElementById(
+            "serieForm"
+        )
+        .addEventListener(
+            "submit",
+            async event => {
+
+                event.preventDefault();
+
+
+                const titulo =
+                    document
+                        .getElementById(
+                            "serieTitulo"
+                        )
+                        .value
+                        .trim();
+
+
+                const genero =
+                    document
+                        .getElementById(
+                            "serieGenero"
+                        )
+                        .value
+                        .trim();
+
+
+                const plataforma =
+                    document
+                        .getElementById(
+                            "seriePlataforma"
+                        )
+                        .value
+                        .trim();
+
+
+                const temporadas =
+                    parseInt(
+                        document
+                            .getElementById(
+                                "serieTemporadas"
+                            )
+                            .value,
+                        10
+                    );
+
+
+                const video =
+                    document
+                        .getElementById(
+                            "serieVideo"
+                        )
+                        .files[0];
+
+
+                const existente =
+                    editingSerieId
+                        ? series.find(
+                            s =>
+                                s.id ===
+                                editingSerieId
+                        )
+                        : null;
+
+
+                const payload = {
+
+                    titulo,
+                    genero,
+                    plataforma,
+                    temporadas,
+
+                    archivo:
+                        existente
+                            ? existente.archivo
+                            : null
+                };
+
+
+                try {
+
+                    let response;
+
+                    let data;
+
+                    let serieId;
+
+
+                    if (editingSerieId) {
+
+                        response =
+                            await fetch(
+                                `/series/${editingSerieId}`,
+                                {
+                                    method:
+                                        "PUT",
+
+                                    headers: {
+
+                                        "Content-Type":
+                                            "application/json",
+
+                                        Authorization:
+                                            `Bearer ${token}`
+                                    },
+
+                                    body:
+                                        JSON.stringify(
+                                            payload
+                                        )
+                                }
+                            );
+
+
+                        data =
+                            await response.json();
+
+
+                        serieId =
+                            editingSerieId;
+
+                    } else {
+
+                        response =
+                            await fetch(
+                                "/series",
+                                {
+                                    method:
+                                        "POST",
+
+                                    headers: {
+
+                                        "Content-Type":
+                                            "application/json",
+
+                                        Authorization:
+                                            `Bearer ${token}`
+                                    },
+
+                                    body:
+                                        JSON.stringify(
+                                            payload
+                                        )
+                                }
+                            );
+
+
+                        data =
+                            await response.json();
+
+
+                        serieId =
+                            data.id;
+                    }
+
+
+                    if (!response.ok) {
+
+                        showToast(
+                            data.error ||
+                            "No fue posible guardar la serie.",
+                            "error"
+                        );
+
+                        return;
+                    }
+
+
+                    if (video) {
+
+                        const uploadOk =
+                            await uploadVideo(
+                                serieId,
+                                video
+                            );
+
+
+                        if (!uploadOk) {
+                            return;
+                        }
+                    }
+
+
+                    const wasEditing =
+                        editingSerieId !== null;
+
+
+                    closeSerieModal();
+
+
+                    showToast(
+                        wasEditing
+                            ? "Serie actualizada correctamente."
+                            : "Serie creada correctamente.",
+                        "success"
+                    );
+
+
+                    await loadSeries();
+
+
+                } catch (error) {
+
+                    showToast(
+                        "No fue posible conectar con el servidor.",
+                        "error"
+                    );
+                }
+            }
+        );
+
+
+    async function uploadVideo(
+        serieId,
+        archivo
+    ) {
+
+        const formData =
+            new FormData();
+
+
+        formData.append(
+            "video",
+            archivo
+        );
+
+
+        const response =
+            await fetch(
+                `/series/${serieId}/video`,
+                {
+                    method:
+                        "POST",
+
+                    headers: {
+
+                        Authorization:
+                            `Bearer ${token}`
+                    },
+
+                    body:
+                        formData
+                }
+            );
+
+
+        const data =
+            await response.json();
+
+
+        if (!response.ok) {
+
+            showToast(
+                data.error ||
+                "La serie fue guardada, pero no se pudo cargar el video.",
+                "error"
+            );
+
+            return false;
+        }
+
+
+        return true;
+    }
+
+
+    function openDeleteModal(id) {
+
+        const serie =
+            series.find(
+                item =>
+                    item.id === id
+            );
+
+
+        if (!serie) {
+            return;
+        }
+
+
+        deletingSerieId =
+            id;
+
+
+        document.getElementById(
+            "deleteSerieName"
+        ).textContent =
+            `"${serie.titulo}"`;
+
+
+        document
+            .getElementById(
+                "deleteModal"
+            )
+            .classList.remove(
+                "hidden"
+            );
+    }
+
+
+    function closeDeleteModal() {
+
+        deletingSerieId =
+            null;
+
+
+        document
+            .getElementById(
+                "deleteModal"
+            )
+            .classList.add(
+                "hidden"
+            );
+    }
+
+
+    async function confirmDelete() {
+
+        if (!deletingSerieId) {
+            return;
+        }
+
+
+        try {
+
+            const response =
+                await fetch(
+                    `/series/${deletingSerieId}`,
+                    {
+                        method:
+                            "DELETE",
+
+                        headers: {
+
+                            Authorization:
+                                `Bearer ${token}`
+                        }
+                    }
+                );
+
+
+            const data =
+                await response.json();
+
+
+            if (!response.ok) {
+
+                showToast(
+                    data.error ||
+                    "No fue posible eliminar la serie.",
+                    "error"
+                );
+
+                return;
+            }
+
+
+            closeDeleteModal();
+
+
+            showToast(
+                "Serie eliminada correctamente.",
+                "success"
+            );
+
+
+            await loadSeries();
+
+
+        } catch (error) {
+
+            showToast(
+                "No fue posible conectar con el servidor.",
+                "error"
+            );
+        }
+    }
+
+
+    function openVideo(id) {
+
+        const serie =
+            series.find(
+                item =>
+                    item.id === id
+            );
+
+
+        if (!serie) {
+            return;
+        }
+
+
+        document.getElementById(
+            "videoTitle"
+        ).textContent =
+            `${serie.titulo} · ${serie.temporadas} ${
+                serie.temporadas === 1
+                    ? "temporada"
+                    : "temporadas"
+            }`;
+
+
+        const player =
+            document.getElementById(
+                "videoPlayer"
+            );
+
+
+        player.src =
+            `/series/${id}/ver`;
+
+
+        document
+            .getElementById(
+                "videoModal"
+            )
+            .classList.remove(
+                "hidden"
+            );
+
+
+        player.load();
+    }
+
+
+    function closeVideoModal() {
+
+        const player =
+            document.getElementById(
+                "videoPlayer"
+            );
+
+
+        player.pause();
+
+
+        player.removeAttribute(
+            "src"
+        );
+
+
+        document
+            .getElementById(
+                "videoModal"
+            )
+            .classList.add(
+                "hidden"
+            );
+    }
+
+
+    function downloadVideo(id) {
+
+        window.location.href =
+            `/series/${id}/descargar`;
+    }
+
+
+    async function checkApiStatus() {
+
+        try {
+
+            const response =
+                await fetch(
+                    "/series"
+                );
+
+
+            if (!response.ok) {
+
+                showToast(
+                    "La API respondió con un error.",
+                    "error"
+                );
+
+                return;
+            }
+
+
+            const data =
+                await response.json();
+
+
+            showToast(
+                `API conectada correctamente. ${data.length} series disponibles.`,
+                "success"
+            );
+
+
+        } catch (error) {
+
+            showToast(
+                "No fue posible conectar con la API.",
+                "error"
+            );
+        }
+    }
+
+
+    function showMessage(
+        elementId,
+        text,
+        type
+    ) {
+
+        const element =
+            document.getElementById(
+                elementId
+            );
+
+
+        element.innerHTML = `
+            <div class="message ${
+                type === "success"
+                    ? "message-success"
+                    : "message-error"
+            }">
+
+                ${escapeHtml(text)}
+
+            </div>
+        `;
+    }
+
+
+    function clearMessage(
+        elementId
+    ) {
+
+        document.getElementById(
+            elementId
+        ).innerHTML =
+            "";
+    }
+
+
+    function showToast(
+        text,
+        type = "success"
+    ) {
+
+        const container =
+            document.getElementById(
+                "toastContainer"
+            );
+
+
+        const toast =
+            document.createElement(
+                "div"
+            );
+
+
+        toast.className =
+            `toast ${type}`;
+
+
+        toast.textContent =
+            text;
+
+
+        container.appendChild(
+            toast
+        );
+
+
+        setTimeout(
+            () => {
+
+                toast.remove();
+
+            },
+            3500
+        );
+    }
+
+
+    function escapeHtml(value) {
+
+        return String(
+            value ?? ""
+        )
+            .replaceAll(
+                "&",
+                "&amp;"
+            )
+            .replaceAll(
+                "<",
+                "&lt;"
+            )
+            .replaceAll(
+                ">",
+                "&gt;"
+            )
+            .replaceAll(
+                '"',
+                "&quot;"
+            )
+            .replaceAll(
+                "'",
+                "&#039;"
+            );
+    }
+
+</script>
+
+</body>
+</html>

@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mi cuenta | Series API</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        :root {
+            --bg: #07111f;
+            --panel: #102036;
+            --border: #214565;
+            --text: #f5f7fa;
+            --muted: #91a4b7;
+            --blue: #1687ff;
+            --cyan: #00c9d9;
+            --coral: #ff6258;
+            --green: #19c37d;
+            --yellow: #ffc857;
+        }
+
+        body {
+            min-height: 100vh;
+            font-family: Inter, Arial, Helvetica, sans-serif;
+            background:
+                radial-gradient(circle at 10% 10%, rgba(0,201,217,.12), transparent 30%),
+                radial-gradient(circle at 90% 90%, rgba(255,98,88,.10), transparent 30%),
+                var(--bg);
+            color: var(--text);
+        }
+
+        .navbar {
+            height: 72px;
+            background: rgba(7,17,31,.95);
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+        }
+
+        .navbar-inner {
+            width: 100%;
+            max-width: 1200px;
+            margin: auto;
+            padding: 0 25px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 22px;
+            font-weight: 800;
+        }
+
+        .logo {
+            width: 42px;
+            height: 42px;
+            display: grid;
+            place-items: center;
+            border-radius: 12px;
+            background: linear-gradient(
+                135deg,
+                var(--coral),
+                #ff856c
+            );
+        }
+
+        .back {
+            text-decoration: none;
+            color: white;
+            border: 1px solid var(--border);
+            background: var(--panel);
+            padding: 9px 14px;
+            border-radius: 9px;
+        }
+
+        .container {
+            max-width: 1050px;
+            margin: auto;
+            padding: 50px 25px;
+        }
+
+        .page-title {
+            margin-bottom: 30px;
+        }
+
+        .page-title h1 {
+            font-size: 34px;
+            margin-bottom: 8px;
+        }
+
+        .page-title p {
+            color: var(--muted);
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1.3fr;
+            gap: 25px;
+        }
+
+        .card {
+            background: var(--panel);
+            border: 1px solid var(--border);
+            border-radius: 18px;
+            padding: 28px;
+        }
+
+        .profile {
+            text-align: center;
+        }
+
+        .avatar {
+            width: 90px;
+            height: 90px;
+            margin: 0 auto 20px;
+            border-radius: 50%;
+            display: grid;
+            place-items: center;
+            font-size: 40px;
+            background: linear-gradient(
+                135deg,
+                var(--cyan),
+                var(--blue)
+            );
+        }
+
+        .role {
+            display: inline-block;
+            margin-top: 8px;
+            padding: 6px 12px;
+            border-radius: 999px;
+            color: var(--yellow);
+            border: 1px solid rgba(255,200,87,.25);
+        }
+
+        .status {
+            display: inline-block;
+            margin-top: 10px;
+            color: #53e3a7;
+        }
+
+        .info {
+            margin-top: 30px;
+            text-align: left;
+        }
+
+        .info-row {
+            padding: 14px 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .info-label {
+            color: var(--muted);
+            font-size: 12px;
+        }
+
+        .info-value {
+            font-weight: 700;
+            margin-top: 4px;
+        }
+
+        .password-card h2 {
+            margin-bottom: 7px;
+        }
+
+        .subtitle {
+            color: var(--muted);
+            margin-bottom: 25px;
+        }
+
+        .form-group {
+            margin-bottom: 18px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        input {
+            width: 100%;
+            padding: 13px 14px;
+            color: white;
+            background: #091526;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            outline: none;
+        }
+
+        input:focus {
+            border-color: var(--cyan);
+        }
+
+        .btn {
+            width: 100%;
+            padding: 13px;
+            border: none;
+            border-radius: 10px;
+            color: white;
+            font-weight: 700;
+            cursor: pointer;
+            background: linear-gradient(
+                90deg,
+                var(--coral),
+                #ff7967
+            );
+        }
+
+        .message {
+            margin-bottom: 18px;
+            padding: 12px;
+            border-radius: 9px;
+        }
+
+        .success {
+            color: #5be2aa;
+            background: rgba(25,195,125,.10);
+        }
+
+        .error {
+            color: #ff8585;
+            background: rgba(239,68,68,.10);
+        }
+
+        @media (max-width: 800px) {
+            .grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<header class="navbar">
+
+    <div class="navbar-inner">
+
+        <div class="brand">
+            <div class="logo">🎬</div>
+            Series API
+        </div>
+
+        <a href="/" class="back">
+            ← Volver al catálogo
+        </a>
+
+    </div>
+
+</header>
+
+<main class="container">
+
+    <div class="page-title">
+
+        <h1>Mi cuenta</h1>
+
+        <p>
+            Consulta tu información y administra tu contraseña.
+        </p>
+
+    </div>
+
+    <div class="grid">
+
+        <section class="card profile">
+
+            <div class="avatar">
+                👤
+            </div>
+
+            <h2 id="username">
+                Usuario
+            </h2>
+
+            <span
+                id="role"
+                class="role">
+                USUARIO
+            </span>
+
+            <br>
+
+            <span class="status">
+                ● Sesión activa
+            </span>
+
+            <div class="info">
+
+                <div class="info-row">
+
+                    <div class="info-label">
+                        Nombre de usuario
+                    </div>
+
+                    <div
+                        id="usernameInfo"
+                        class="info-value">
+                        -
+                    </div>
+
+                </div>
+
+                <div class="info-row">
+
+                    <div class="info-label">
+                        Rol
+                    </div>
+
+                    <div
+                        id="roleInfo"
+                        class="info-value">
+                        -
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+        <section class="card password-card">
+
+            <h2>
+                🔐 Cambiar contraseña
+            </h2>
+
+            <p class="subtitle">
+                Ingresa tu contraseña actual y define una nueva contraseña.
+            </p>
+
+            <div id="message"></div>
+
+            <form id="passwordForm">
+
+                <div class="form-group">
+
+                    <label for="currentPassword">
+                        Contraseña actual
+                    </label>
+
+                    <input
+                        id="currentPassword"
+                        type="password"
+                        required>
+
+                </div>
+
+                <div class="form-group">
+
+                    <label for="newPassword">
+                        Nueva contraseña
+                    </label>
+
+                    <input
+                        id="newPassword"
+                        type="password"
+                        minlength="6"
+                        required>
+
+                </div>
+
+                <div class="form-group">
+
+                    <label for="confirmPassword">
+                        Confirmar nueva contraseña
+                    </label>
+
+                    <input
+                        id="confirmPassword"
+                        type="password"
+                        minlength="6"
+                        required>
+
+                </div>
+
+                <button
+                    class="btn"
+                    type="submit">
+
+                    Actualizar contraseña
+
+                </button>
+
+            </form>
+
+        </section>
+
+    </div>
+
+</main>
+
+<script>
+
+    const token =
+        localStorage.getItem(
+            "series_token"
+        );
+
+    if (!token) {
+        window.location.href = "/";
+    }
+
+
+    async function loadAccount() {
+
+        try {
+
+            const response =
+                await fetch(
+                    "/me",
+                    {
+                        headers: {
+                            Authorization:
+                                `Bearer ${token}`
+                        }
+                    }
+                );
+
+            if (!response.ok) {
+
+                localStorage.removeItem(
+                    "series_token"
+                );
+
+                localStorage.removeItem(
+                    "series_role"
+                );
+
+                localStorage.removeItem(
+                    "series_username"
+                );
+
+                window.location.href = "/";
+
+                return;
+            }
+
+            const data =
+                await response.json();
+
+            document
+                .getElementById(
+                    "username"
+                )
+                .textContent =
+                    data.username;
+
+            document
+                .getElementById(
+                    "usernameInfo"
+                )
+                .textContent =
+                    data.username;
+
+            document
+                .getElementById(
+                    "role"
+                )
+                .textContent =
+                    data.rol.toUpperCase();
+
+            document
+                .getElementById(
+                    "roleInfo"
+                )
+                .textContent =
+                    data.rol === "admin"
+                        ? "Administrador"
+                        : "Usuario";
+
+        } catch (error) {
+
+            showMessage(
+                "No fue posible cargar la información.",
+                "error"
+            );
+        }
+    }
+
+
+    document
+        .getElementById(
+            "passwordForm"
+        )
+        .addEventListener(
+            "submit",
+            async event => {
+
+                event.preventDefault();
+
+                const claveActual =
+                    document
+                        .getElementById(
+                            "currentPassword"
+                        )
+                        .value;
+
+                const claveNueva =
+                    document
+                        .getElementById(
+                            "newPassword"
+                        )
+                        .value;
+
+                const confirmacion =
+                    document
+                        .getElementById(
+                            "confirmPassword"
+                        )
+                        .value;
+
+                if (
+                    claveNueva !== confirmacion
+                ) {
+
+                    showMessage(
+                        "Las nuevas contraseñas no coinciden.",
+                        "error"
+                    );
+
+                    return;
+                }
+
+                try {
+
+                    const response =
+                        await fetch(
+                            "/me/password",
+                            {
+                                method: "PUT",
+
+                                headers: {
+
+                                    "Content-Type":
+                                        "application/json",
+
+                                    Authorization:
+                                        `Bearer ${token}`
+                                },
+
+                                body:
+                                    JSON.stringify({
+
+                                        clave_actual:
+                                            claveActual,
+
+                                        clave_nueva:
+                                            claveNueva
+                                    })
+                            }
+                        );
+
+                    const data =
+                        await response.json();
+
+                    if (!response.ok) {
+
+                        showMessage(
+                            data.error ||
+                            "No fue posible cambiar la contraseña.",
+                            "error"
+                        );
+
+                        return;
+                    }
+
+                    showMessage(
+                        data.message,
+                        "success"
+                    );
+
+                    document
+                        .getElementById(
+                            "passwordForm"
+                        )
+                        .reset();
+
+                } catch (error) {
+
+                    showMessage(
+                        "No fue posible conectar con el servidor.",
+                        "error"
+                    );
+                }
+            }
+        );
+
+
+    function showMessage(
+        text,
+        type
+    ) {
+
+        document
+            .getElementById(
+                "message"
+            )
+            .innerHTML =
+                `
+                    <div class="message ${type}">
+                        ${text}
+                    </div>
+                `;
+    }
+
+
+    loadAccount();
+
+</script>
+
+</body>
+
+</html>
