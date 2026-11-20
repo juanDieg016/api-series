@@ -3,3 +3,4 @@ pyjwt
 pymongo
 dnspython
 python-dotenv
+gunicorn
